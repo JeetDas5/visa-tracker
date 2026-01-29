@@ -13,6 +13,10 @@ app.use(requestLogger);
 
 app.use("/alerts", alertRoutes);
 
+app.get("/", (req: Request, res: Response) => {
+  res.status(200).json({ message: "Welcome to the Visa Tracker API" });
+});
+
 app.get("/health", (req: Request, res: Response) => {
   res.status(200).json({ status: "OK", timestamp: new Date().toISOString() });
 });
