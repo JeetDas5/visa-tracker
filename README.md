@@ -1,73 +1,264 @@
-# React + TypeScript + Vite
+# 🛂 Visa Slot Tracker - The Flying Panda
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, full-stack internal tool for tracking visa slot alerts with a beautiful UI and robust backend.
 
-Currently, two official plugins are available:
+![Tech Stack](https://img.shields.io/badge/Stack-React%20%7C%20Node.js%20%7C%20PostgreSQL-blue)
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) (or [oxc](https://oxc.rs) when used in [rolldown-vite](https://vite.dev/guide/rolldown)) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## 🚀 Features
 
-## React Compiler
+### Backend (Node.js + Express + Drizzle ORM)
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- ✅ **RESTful API** with proper HTTP status codes
+- ✅ **CRUD Operations** for visa alerts
+- ✅ **Query Filters** (country, status)
+- ✅ **Pagination** support
+- ✅ **Custom Middleware** (logger & validator)
+- ✅ **Centralized Error Handling**
+- ✅ **PostgreSQL** with Neon DB
+- ✅ **Drizzle ORM** for type-safe database queries
 
-## Expanding the ESLint configuration
+### Frontend (Vite + React + shadcn/ui)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+- ✅ **Modern UI** with Tailwind CSS & shadcn/ui
+- ✅ **Form Validation** with React Hook Form & Zod
+- ✅ **Real-time Updates** with optimistic UI
+- ✅ **Pagination** with customizable page size
+- ✅ **Filters** for country and status
+- ✅ **Inline Status Updates**
+- ✅ **Delete Confirmation** dialogs
+- ✅ **Toast Notifications**
+- ✅ **Responsive Design**
+- ✅ **Dark Mode** support
+- ✅ **Premium Glassmorphism** effects
 
-```js
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+## 📋 Data Model
 
-      // Remove tseslint.configs.recommended and replace with this
-      tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      tseslint.configs.stylisticTypeChecked,
+Each alert contains:
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+- `id` - Auto-incrementing primary key
+- `country` - Country name (max 100 chars)
+- `city` - City name (max 100 chars)
+- `visaType` - Tourist | Business | Student
+- `status` - Active | Booked | Expired
+- `createdAt` - Timestamp
+
+## 🛠️ Tech Stack
+
+**Backend:**
+
+- Node.js & Express
+- TypeScript
+- Drizzle ORM
+- Neon PostgreSQL
+- Zod (validation)
+
+**Frontend:**
+
+- React 19
+- Vite
+- TypeScript
+- Tailwind CSS v4
+- shadcn/ui
+- React Hook Form
+- date-fns
+
+## 📦 Installation
+
+### Prerequisites
+
+- Node.js 18+
+- pnpm (or npm/yarn)
+- Neon DB account
+
+### 1. Clone & Install
+
+`cd visa-tracker
+pnpm install`
+
+### 2. Environment Setup
+
+Create a `.env` file in the root directory:
+
+`DATABASE_URL=your_neon_database_url
+PORT=3000
+NODE_ENV=development`
+
+### 3. Database Setup
+
+# Generate migration files
+
+```bash
+pnpm db:generate
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
+# Push schema to database
 
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default defineConfig([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+```bash
+pnpm db:push
 ```
+
+# (Optional) Open Drizzle Studio to view your database
+
+```bash
+pnpm db:studio
+```
+
+## 🚀 Running the Application
+
+### Development Mode
+
+**Terminal 1 - Backend:**
+
+```
+pnpm server
+```
+
+**Terminal 2 - Frontend:**
+
+```
+pnpm dev
+```
+
+The backend will run on `http://localhost:3000`  
+The frontend will run on `http://localhost:5173`
+
+## 📡 API Endpoints
+
+### GET `/alerts`
+
+Get all alerts with optional filters and pagination
+
+**Query Parameters:**
+
+- `country` (optional) - Filter by country
+- `status` (optional) - Filter by status
+- `page` (optional, default: 1) - Page number
+- `limit` (optional, default: 10) - Items per page
+
+**Response:**
+
+```
+{
+"data": [...],
+"pagination": {
+"page": 1,
+"limit": 10,
+"total": 50,
+"totalPages": 5
+}
+}
+```
+
+### POST `/alerts`
+
+Create a new alert
+
+**Request Body:**
+
+```
+{
+"country": "United States",
+"city": "New York",
+"visaType": "Tourist",
+"status": "Active"
+}
+```
+
+### PUT `/alerts/:id`
+
+Update an existing alert
+
+**Request Body:** (all fields optional)
+
+```
+{
+"status": "Booked"
+}
+```
+
+### DELETE `/alerts/:id`
+
+Delete an alert
+
+**Response:**
+
+```
+{
+"message": "Alert deleted successfully"
+}
+```
+
+## 🎨 UI Features
+
+- **Gradient Backgrounds** - Beautiful blue-to-indigo gradients
+- **Glassmorphism** - Frosted glass effects on cards
+- **Color-Coded Badges** - Visual status indicators
+- **Smooth Animations** - Loading states and transitions
+- **Responsive Design** - Works on all screen sizes
+- **Dark Mode** - Full dark theme support
+
+## 📁 Project Structure
+
+```
+visa-tracker/
+├── backend/
+│ ├── db/
+│ │ └── schema.ts # Database schema
+│ ├── middleware/
+│ │ ├── logger.ts # Request logger
+│ │ └── validator.ts # Zod validators
+│ ├── routes/
+│ │ └── alerts.ts # Alert routes
+│ ├── drizzle.config.ts # Drizzle configuration
+│ ├── index.ts # Database connection
+│ └── server.ts # Express server
+├── src/
+│ ├── components/
+│ │ ├── ui/ # shadcn/ui components
+│ │ ├── alert-form.tsx # Create alert form
+│ │ ├── alerts-table.tsx # Alerts table
+│ │ └── pagination.tsx # Pagination component
+│ ├── services/
+│ │ └── alertService.ts # API service layer
+│ ├── App.tsx # Main app component
+│ └── index.css # Global styles
+└── package.json
+```
+
+## 🔧 Available Scripts
+
+- `pnpm dev` - Start frontend dev server
+- `pnpm server` - Start backend server
+- `pnpm build` - Build for production
+- `pnpm db:generate` - Generate migrations
+- `pnpm db:push` - Push schema to database
+- `pnpm db:studio` - Open Drizzle Studio
+
+## 🎯 Key Features Implemented
+
+### Backend
+
+✅ Custom middleware (logger + validator)  
+✅ Query filters (country, status)  
+✅ Pagination with customizable limit  
+✅ Proper HTTP status codes (200, 201, 400, 404, 500)  
+✅ Centralized error handling  
+✅ Input validation with Zod  
+✅ Type-safe database queries with Drizzle ORM
+
+### Frontend
+
+✅ Form with validation  
+✅ Table/List view  
+✅ Update status button  
+✅ Delete with confirmation  
+✅ Pagination controls  
+✅ Filters (country, status)  
+✅ API integration  
+✅ Toast notifications  
+✅ Loading states  
+✅ Premium design
+
+
+
+**Built with ❤️ by Jeet Das**
