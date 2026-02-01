@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect, useCallback } from "react";
 import { AlertForm } from "@/components/alert-form";
 import { AlertsTable } from "@/components/alerts-table";
@@ -18,7 +19,6 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import { Separator } from "@/components/ui/separator";
 import { Toaster } from "@/components/ui/sonner";
 import { alertService } from "@/services/alertService";
 import type { Alert, PaginatedResponse } from "@/services/alertService";
@@ -109,108 +109,114 @@ function App() {
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-8 space-y-8">
-        <Card className="border-2 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
-          <CardHeader>
-            <CardTitle className="text-2xl">Create New Alert</CardTitle>
-            <CardDescription>
-              Set up a new visa slot alert to track availability
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <AlertForm onSuccess={fetchAlerts} />
-          </CardContent>
-        </Card>
-
-        <Separator className="my-8" />
-
-        <Card className="border-2 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
-          <CardHeader>
-            <div className="flex items-center justify-between">
-              <div>
-                <CardTitle className="text-2xl">Active Alerts</CardTitle>
+      <main className="container mx-auto px-4 py-8">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+          {/* Create Alert Form - Left Side */}
+          <div className="lg:col-span-4">
+            <Card className="border-2 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm sticky top-24">
+              <CardHeader>
+                <CardTitle className="text-2xl">Create New Alert</CardTitle>
                 <CardDescription>
-                  Manage and track your visa slot alerts
+                  Set up a new visa slot alert to track availability
                 </CardDescription>
-              </div>
-            </div>
+              </CardHeader>
+              <CardContent>
+                <AlertForm onSuccess={fetchAlerts} />
+              </CardContent>
+            </Card>
+          </div>
 
-            <div className="flex flex-wrap gap-4 pt-4">
-              <div className="flex-1 min-w-[200px]">
-                <Input
-                  placeholder="Filter by country..."
-                  value={filters.country}
-                  onChange={(e) =>
-                    setFilters({ ...filters, country: e.target.value })
-                  }
-                  onKeyDown={(e) => {
-                    if (e.key === "Enter") {
-                      setAppliedFilters(filters);
-                      setPagination((prev) => ({ ...prev, page: 1 }));
+          {/* Alerts Dashboard - Right Side */}
+          <div className="lg:col-span-8">
+            <Card className="border-2 shadow-lg bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <div>
+                    <CardTitle className="text-2xl">Active Alerts</CardTitle>
+                    <CardDescription>
+                      Manage and track your visa slot alerts
+                    </CardDescription>
+                  </div>
+                </div>
+
+                <div className="flex flex-wrap gap-4 pt-4">
+                  <div className="flex-1 min-w-50">
+                    <Input
+                      placeholder="Filter by country..."
+                      value={filters.country}
+                      onChange={(e) =>
+                        setFilters({ ...filters, country: e.target.value })
+                      }
+                      onKeyDown={(e) => {
+                        if (e.key === "Enter") {
+                          setAppliedFilters(filters);
+                          setPagination((prev) => ({ ...prev, page: 1 }));
+                        }
+                      }}
+                      className="bg-background"
+                    />
+                  </div>
+
+                  <Select
+                    value={filters.status}
+                    onValueChange={(value) =>
+                      setFilters({
+                        ...filters,
+                        status: value === "all" ? "" : value,
+                      })
                     }
-                  }}
-                  className="bg-background"
-                />
-              </div>
+                  >
+                    <SelectTrigger className="w-45 bg-background">
+                      <SelectValue placeholder="Filter by status" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      <SelectItem value="all">All Statuses</SelectItem>
+                      <SelectItem value="Active">Active</SelectItem>
+                      <SelectItem value="Booked">Booked</SelectItem>
+                      <SelectItem value="Expired">Expired</SelectItem>
+                    </SelectContent>
+                  </Select>
 
-              <Select
-                value={filters.status}
-                onValueChange={(value) =>
-                  setFilters({
-                    ...filters,
-                    status: value === "all" ? "" : value,
-                  })
-                }
-              >
-                <SelectTrigger className="w-[180px] bg-background">
-                  <SelectValue placeholder="Filter by status" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Statuses</SelectItem>
-                  <SelectItem value="Active">Active</SelectItem>
-                  <SelectItem value="Booked">Booked</SelectItem>
-                  <SelectItem value="Expired">Expired</SelectItem>
-                </SelectContent>
-              </Select>
+                  <div className="flex gap-2">
+                    {hasActiveFilters && (
+                      <Button onClick={handleClearFilters} variant="outline">
+                        <X className="mr-2 h-4 w-4" />
+                        Clear Filters
+                      </Button>
+                    )}
+                  </div>
+                </div>
+              </CardHeader>
 
-              <div className="flex gap-2">
-                {hasActiveFilters && (
-                  <Button onClick={handleClearFilters} variant="outline">
-                    <X className="mr-2 h-4 w-4" />
-                    Clear Filters
-                  </Button>
+              <CardContent>
+                {isLoading ? (
+                  <div className="flex items-center justify-center py-12">
+                    <Loader2 className="h-8 w-8 animate-spin text-primary" />
+                  </div>
+                ) : (
+                  <>
+                    <AlertsTable alerts={alerts} onUpdate={fetchAlerts} />
+
+                    {pagination.total > 0 && (
+                      <Pagination
+                        currentPage={pagination.page}
+                        totalPages={pagination.totalPages}
+                        pageSize={pagination.limit}
+                        total={pagination.total}
+                        onPageChange={(page) =>
+                          setPagination({ ...pagination, page })
+                        }
+                        onPageSizeChange={(limit) =>
+                          setPagination({ ...pagination, limit, page: 1 })
+                        }
+                      />
+                    )}
+                  </>
                 )}
-              </div>
-            </div>
-          </CardHeader>
-
-          <CardContent>
-            {isLoading ? (
-              <div className="flex items-center justify-center py-12">
-                <Loader2 className="h-8 w-8 animate-spin text-primary" />
-              </div>
-            ) : (
-              <>
-                <AlertsTable alerts={alerts} onUpdate={fetchAlerts} />
-
-                {pagination.total > 0 && (
-                  <Pagination
-                    currentPage={pagination.page}
-                    totalPages={pagination.totalPages}
-                    pageSize={pagination.limit}
-                    total={pagination.total}
-                    onPageChange={(page) =>
-                      setPagination({ ...pagination, page })
-                    }
-                    onPageSizeChange={(limit) =>
-                      setPagination({ ...pagination, limit, page: 1 })
-                    }
-                  />
-                )}
-              </>
-            )}
-          </CardContent>
-        </Card>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
       </main>
 
       <footer className="border-t bg-white/50 dark:bg-slate-950/50 backdrop-blur-xl mt-12">
